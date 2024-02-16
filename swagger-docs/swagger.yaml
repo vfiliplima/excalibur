@@ -1,0 +1,186 @@
+openapi: "3.0.0"
+info:
+  title: "API Documentation"
+  version: "1.0.0"
+  description: "API documentation for your Node.js application"
+paths:
+  /tasks:
+    get:
+      tags:
+        - Tasks
+      summary: "Retrieve a list of tasks"
+      description: "Retrieve a list of tasks associated with the authenticated user or their manager."
+      responses:
+        "200":
+          description: "A list of tasks."
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Task"
+        "401":
+          description: "Unauthorized. The user is not authenticated."
+        "500":
+          description: "Internal Server Error. An unexpected error occurred."
+    post:
+      tags:
+        - Tasks
+      summary: "Create a new tasks"
+      description: "Create a new task and associates it with the authenticated user"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewTask"
+      responses:
+        "201":
+          description: "Details of the newly created task"
+          content:
+            application/json:
+              schema:
+                  $ref: "#/components/schemas/Task"
+        "400":
+          description: "Bad Request. Invalid input."
+        "401":
+          description: "Unauthorized. The user is not authenticated."
+        "500":
+          description: "Internal Server Error. An unexpected error occurred."
+  /tasks/{id}:
+    get:
+        tags:
+          - Tasks
+        summary: "Retrieve details of a specified tasks"
+        description: "Retrieve details of a task associated with the authenticated user or their manager."
+        parameters:
+          - in: path
+            name: id
+            required: true
+            description: The ID of the task to retrieve.
+            schema:
+              type: integer
+        responses:
+          "200":
+            description: "Details of the specified task."
+            content:
+              application/json:
+                  schema:
+                    $ref: "#/components/schemas/Task"
+          "401":
+            description: "Unauthorized. The user is not authenticated."
+          "500":
+            description: "Internal Server Error. An unexpected error occurred."
+    patch:
+        tags:
+          - Tasks
+        summary: "Update details of a specified tasks"
+        description: "Update details of a task associated with the authenticated user or their manager."
+        parameters:
+          - in: path
+            name: id
+            required: true
+            description: The ID of the task to update.
+            schema:
+              type: integer
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateTask"
+        responses:
+          "200":
+            description: "Details of the updated task."
+            content:
+              application/json:
+                  schema:
+                    $ref: "#/components/schemas/Task"
+          "400":
+            description: "Bad Request. Invalid input."
+          "401":
+            description: "Unauthorized. The user is not authenticated."
+          "500":
+            description: "Internal Server Error. An unexpected error occurred."
+    delete:
+        tags:
+          - Tasks
+        summary: "Delete details of a specified tasks"
+        description: "Delete details of a task associated with the authenticated user or their manager."
+        parameters:
+          - in: path
+            name: id
+            required: true
+            description: The ID of the task to delete.
+            schema:
+              type: integer
+        responses:
+          "200":
+            description: "Details of the deleted task."
+            content:
+              application/json:
+                  schema:
+                    $ref: "#/components/schemas/Task"
+          "401":
+            description: "Unauthorized. The user is not authenticated."
+          "500":
+            description: "Internal Server Error. An unexpected error occurred."
+
+components:
+  schemas:
+    Task:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: "The unique identifier of the task."
+        summary:
+          type: string
+          description: "A summary of the task."
+        status:
+          type: string
+          description: "The status of the task."
+        completionDate:
+          type: string
+          format: date-time
+          description: "The completion date of the task."
+        technician:
+          type: string
+          description: "The technician assigned to the task."
+
+    NewTask:
+      type: object
+      properties:
+        summary:
+          type: string
+          description: "A summary of the new task."
+          example: "New task summary"
+        technicianId:
+          type: integer
+          description: "The ID of the technician assigned to the task."
+          example: 123
+        managerId:
+          type: integer
+          description: "The ID of the manager associated with the task."
+          example: 456
+      required:
+        - summary
+        - technicianId
+        - managerId
+
+    UpdateTask:
+      type: object
+      properties:
+        summary:
+          type: string
+          description: "A summary of the updated task."
+          example: "Updated task summary"
+        status:
+          type: string
+          description: "The status of the updated task."
+          example: "completed"
+        completionDate:
+          type: string
+          format: date-time
+          description: "The completion date of the updated task."
+          example: "2024-02-28T12:00:00Z"
