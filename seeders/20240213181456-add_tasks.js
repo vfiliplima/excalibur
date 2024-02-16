@@ -10,7 +10,7 @@ module.exports = {
           summary: "squats",
           status: "incomplete",
           technicianId: 4,
-          managerId: 2,
+          managerId: 1,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -18,7 +18,7 @@ module.exports = {
           summary: "pushes",
           status: "incomplete",
           technicianId: 4,
-          managerId: 2,
+          managerId: 1,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -26,7 +26,7 @@ module.exports = {
           summary: "pulls",
           status: "incomplete",
           technicianId: 4,
-          managerId: 2,
+          managerId: 1,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -34,7 +34,7 @@ module.exports = {
           summary: "lunges",
           status: "incomplete",
           technicianId: 4,
-          managerId: 2,
+          managerId: 1,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -42,7 +42,7 @@ module.exports = {
           summary: "twists",
           status: "incomplete",
           technicianId: 4,
-          managerId: 2,
+          managerId: 1,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -52,11 +52,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    /**
-     * Add commands to revert seed here.
-     *
-     * Example:
-     * await queryInterface.bulkDelete('People', null, {});
-     */
+    await queryInterface.bulkDelete("Task", null, {});
   },
 };

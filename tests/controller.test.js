@@ -64,7 +64,7 @@ describe("listTasks", () => {
     const req = { user: { id: 1 } };
     const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
 
-    // Mock models.Task.findAll to throw an error
+    // Mock models.Task.findAll
     models.Task.findAll = jest
       .fn()
       .mockRejectedValue(new Error("Database error"));
@@ -138,7 +138,7 @@ describe("detailTask", () => {
     const req = { params: { id: 999 }, user: { id: 1 } };
     const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
 
-    // Mock Task.findByPk to return null
+    // Mock Task.findByPk
     models.Task.findByPk = jest.fn().mockResolvedValue(null);
 
     await taskController.detailTask(req, res);
@@ -313,7 +313,7 @@ describe("updateTask", () => {
   it("should return 401 Unauthorized if user is not authorized to update the task", async () => {
     const req = {
       params: { id: 1 },
-      user: { id: 2 }, // Different user ID
+      user: { id: 2 },
       body: { summary: "Updated summary" },
     };
     const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
