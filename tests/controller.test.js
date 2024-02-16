@@ -186,7 +186,6 @@ describe("detailTask", () => {
 
 describe("updateTask", () => {
   it("should update the task when all fields are provided", async () => {
-    // Mock request and response objects
     const req = {
       params: { id: 1 },
       user: { id: 1 },
@@ -208,14 +207,13 @@ describe("updateTask", () => {
 
     await taskController.updateTask(req, res);
 
-    expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({
-        id: 1,
-        summary: "Updated summary",
-        status: "in progress",
-        completionDate: expect.any(Date),
-      })
-    );
+    expect(res.json).toHaveBeenCalledWith({
+      id: 1,
+      summary: "Updated summary",
+      status: "in progress",
+      completionDate: null,
+      technician: 1,
+    });
   });
 
   it("should update only the summary when only summary is provided", async () => {
@@ -237,7 +235,9 @@ describe("updateTask", () => {
 
     await taskController.updateTask(req, res);
 
-    expect(models.Task.findByPk).toHaveBeenCalledWith(1);
+    expect(models.Task.findByPk).toHaveBeenCalledWith(1, {
+      include: [{ as: "technician", model: models.User }],
+    });
     expect(res.json).toHaveBeenCalledWith(
       serializeTask({
         id: 1,
@@ -263,18 +263,50 @@ describe("updateTask", () => {
       status: "incomplete",
       completionDate: null,
       technicianId: 1,
+      technician: { firstName: "John", lastName: "Doe" },
       save: jest.fn().mockResolvedValue(),
     });
 
     await taskController.updateTask(req, res);
 
-    expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({
-        id: 1,
-        summary: "Original summary",
-        status: "completed",
-        completionDate: expect.any(Date),
-      })
+    expect(models.Task.findByPk).toHaveBeenCalledWith(1, {
+      include: [{ as: "technician", model: models.User }],
+    });
+    expect(res.json).toHaveBeenCalledWith({
+      id: 1,
+      summary: "Original summary",
+      status: "completed",
+      completionDate: expect.any(Date),
+      technician: "John Doe",
+    });
+  });
+
+  it("should update task status to completed and log a notification", async () => {
+    const req = {
+      params: { id: 1 },
+      user: { id: 1 },
+      body: { status: "completed" },
+    };
+    const res = { json: jest.fn(), status: jest.fn().mockReturnThis() };
+
+    const task = {
+      id: 1,
+      summary: "Task summary",
+      status: "in progress",
+      completionDate: null,
+      technicianId: 1,
+      technician: { id: 1, firstName: "John", lastName: "Doe" },
+      save: jest.fn().mockResolvedValue(),
+    };
+
+    models.Task.findByPk = jest.fn().mockResolvedValue(task);
+
+    const consoleSpy = jest.spyOn(console, "log");
+
+    await taskController.updateTask(req, res);
+
+    expect(consoleSpy).toHaveBeenCalledWith(
+      `The tech ${task.technician.firstName} ${task.technician.lastName} performed the task ${task.summary} on date ${task.completionDate}`
     );
   });
 
