@@ -52,3 +52,5 @@ Once the project is set up, you can interact with it using Postman or any other 
 
 - The seeds will populate the database with some entries, including explicit passwords for testing purposes.
 - Only documentation, authentication, and tests for tasks were included in this project's scope.
+-   (Tasks were chosen to showcase what could be implemented throughout the project with authentications and authorization checks, documentation, and thorough testing of routes, controllers, and models.)
+
