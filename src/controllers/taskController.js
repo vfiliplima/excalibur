@@ -44,6 +44,11 @@ exports.detailTask = async (req, res) => {
   }
 };
 
+// TODO: move this to a utils or a helpers folder.
+const notifyManager = async (notification) => {
+  console.log(notification);
+};
+
 exports.updateTask = async (req, res) => {
   try {
     const { id } = req.params;
@@ -74,7 +79,7 @@ exports.updateTask = async (req, res) => {
     await task.save();
     if (notify) {
       const notification = `The tech ${technicianFullName} performed the task ${task.summary} on date ${task.completionDate}`;
-      console.log(notification);
+      notifyManager(notification);
     }
     res.json(serializeTask(task));
   } catch (error) {
