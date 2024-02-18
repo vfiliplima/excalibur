@@ -1,5 +1,6 @@
 const models = require("../../models");
 const serializeTask = require("../serializers/taskSerializer");
+const { notifyManager } = require("../utils/utils");
 
 exports.listTasks = async (req, res) => {
   try {
@@ -39,14 +40,9 @@ exports.detailTask = async (req, res) => {
 
     res.json(serializeTask(task));
   } catch (error) {
-    // console.log("Error retrieving task details:", error);
+    console.log("Error retrieving task details:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
-};
-
-// TODO: move this to a utils or a helpers folder.
-const notifyManager = async (notification) => {
-  console.log(notification);
 };
 
 exports.updateTask = async (req, res) => {
@@ -56,7 +52,6 @@ exports.updateTask = async (req, res) => {
     const task = await models.Task.findByPk(id, {
       include: [{ model: models.User, as: "technician" }],
     });
-    let notify = false;
 
     if (!task) {
       return res.status(404).json({ error: `Task with id ${id} not found` });
@@ -65,22 +60,21 @@ exports.updateTask = async (req, res) => {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
-    let technicianFullName = "";
-
     if (status === "completed") {
       task.completionDate = new Date();
-      technicianFullName = `${task.technician.firstName} ${task.technician.lastName}`;
-      notify = true;
     }
 
     if (summary) task.summary = summary;
     if (status) task.status = status;
 
     await task.save();
-    if (notify) {
+
+    if (status === "completed") {
+      const technicianFullName = `${task.technician.firstName} ${task.technician.lastName}`;
       const notification = `The tech ${technicianFullName} performed the task ${task.summary} on date ${task.completionDate}`;
       notifyManager(notification);
     }
+
     res.json(serializeTask(task));
   } catch (error) {
     console.log("Error updating task:", error);
